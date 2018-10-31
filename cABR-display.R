@@ -5,15 +5,17 @@ dev.off()
 library(ggplot2)
 
 
-pathin <- '/Users/ethan/Dropbox/Research/Projects/Projects_current/cABR/cABR-test-2018/cabr_April13/data'
-#pathin <-'/Users/ethan/Desktop/cABR-test-2018/test-28-03-18/data/'
+#pathin <- '/Users/ethan/Dropbox/Research/Projects/Projects_current/cABR/cABR-test-2018/cabr_April13/data'
+#pathin <-'/Users/ethan/Desktop/ethan-october/'
+#pathin <- '/Users/ethan/Dropbox/Research/Projects/Projects_current/cABR/cABR-test-2018/test-04-04-18/data/125us/'
+pathin <- '/Users/ethan/Dropbox/Research/Projects/Projects_current/cABR/the-golden-signal/'
 setwd(pathin)
 
-#file = 'da40altfz.csv'
+file = 'click_right.csv'
 
-file1 = 'cba1.csv'
-file2 = 'cda1.csv'
-file3 = 'cga1.csv'
+file1 = 'da40rarefz.csv'
+file2 = 'da40condfz.csv'
+file3 = 'da40altfz.csv'
 
 
 df = read.csv(file, sep = ',')
@@ -23,13 +25,30 @@ df2 = read.csv(file2, sep = ',')
 df3 = read.csv(file3, sep = ',')
 
 
+
+
 names(df) <- c("point", "time_ms", "d", "uV", "B1", "B2", "B3", "B4")
 
 names(df1) <- c("point", "time_ms", "d", "uV", "B1", "B2", "B3", "B4")
 names(df2) <- c("point", "time_ms", "d", "uV", "B1", "B2", "B3", "B4")
 names(df3) <- c("point", "time_ms", "d", "uV", "B1", "B2", "B3", "B4")
 
-ggplot(data=df, aes(x= time_ms, y=uV)) + geom_line(size = 1, color = "black") + xlim(0,42)
+df <-subset(df, df$uV > 0)
+
+df1 <- subset(df1, df1$uV>0)
+df2 <- subset(df2, df2$uV>0)
+df3 <- subset(df3, df3$uV>0)
+
+df1 <- df1[1:240,]
+df3 <- df3[1:240,]
+
+df$uV <- df$uV*-1
+
+df1$uV <- df1$uV*-1
+df2$uV <- df2$uV*-1
+df3$uV <- df3$uV*-1
+
+ggplot(data=df, aes(x= time_ms, y=uV)) + geom_line(size = 1, color = "black") + xlim(-10,60)
 
 
 # make a single df with all three consonants
@@ -39,7 +58,15 @@ df <- data.frame("time_ms" = df1$time_ms,
                   "ga" = df3$uV)
 df$uV <- rowMeans(df[,-1])
 
+# make a single df with all three polarities
+df <- data.frame("time_ms" = df1$time_ms, 
+                 "rare" = df1$uV, 
+                 "alt" = df2$uV,
+                 "cond" = df3$uV)
+df$uV <- rowMeans(df[,-1])
 
+library(clipr)
+write_clip(df)
 
 # plot grand average
 ggplot(data=df, aes(x= time_ms, y=uV)) +
@@ -50,27 +77,60 @@ ggplot(data=df, aes(x= time_ms, y=uV)) +
   ylab('micro Volts') +
   xlim(0,42)
 
+
 # plot all three consonants
 ggplot(data=df, aes(time_ms )) + 
-  geom_line(aes(y = ba, colour = "ba")) +
-  geom_line(aes(y = da, colour = "da")) +
-  geom_line(aes(y = ga, colour = "ga")) +
-  xlim(-2,42) +
-  ggtitle("ba vs da vs ga")
+  geom_line(aes(y = ba, color = "ba")) +
+  geom_line(aes(y = da, color = "da")) +
+  geom_line(aes(y = ga, color = "ga")) +
+  ggtitle("/da/")
+  
+
+
+# plot all three polarities
+ggplot(data=df, aes(time_ms )) + 
+  geom_line(aes(y = rare, color = "rarefaction")) +
+  geom_line(aes(y = cond, color = "condensation")) +
+  geom_line(aes(y = alt, color = "alternating")) +
+  ggtitle("/da/") + 
+  xlim(-10,65)
+
 
 # plot 2 at a time for figure
 ggplot(data=df, aes(time_ms )) +
-  geom_line(aes(y = ba, colour = "da", size = 1.8)) +
-  geom_line(aes(y = ga, colour = "ga", size = 1.8)) +
-  xlim(0,20) +
+  geom_line(aes(y = ba, colour = "ba", size = 1.2)) +
+  geom_line(aes(y = ga, colour = "ga", size = 1.2)) +
+  xlim(2,16) +
   theme_classic()
 
 
-# plot alternating only
-ggplot(data=df, aes(x= time_ms, y=uV1)) + geom_line(size = 2.2, color = "red") + xlim(0,42)
+# plot sum
+ggplot(data=df, aes(x= time_ms, y=uV)) + geom_line(size = 2.2, color = "black") + xlim(-10,65)
+
+#########
+library(phonTools)
+
+wavfile <- 'da_40.wav'
+wavfile <- 'wave.wav'
+
+sound <- loadsound(wavfile)
+
+pitchtrack(sound)
+spectrogram (sound)
+pitchtrack (sound, addtospect = TRUE)
+
+
+
+
+
 
 ####################
 # try reading in several waves, and see if they match up. 
+
+
+
+
+
 
 library(tuneR)
 library(seewave)

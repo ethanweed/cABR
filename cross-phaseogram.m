@@ -6,30 +6,34 @@
 
 %%
 % extract vectors for each condition and time
-ba = badaga{:,3};
-da = badaga{:,4};
-ga = badaga{:,5};
-time = badaga{:,2};
-%%
+ba = bada{:,2};
+da = bada{:,3};
+time = bada{:,1};
+
 
 %%
 % window each vector, in this case into 16 windows
 bamat = reshape(ba,[],16);
 damat = reshape(da,[],16);
-gamat = reshape(ga,[],16);
+%gamat = reshape(ga,[],16);
+
 
 
 %%
-
 %f = linspace(100,1000,10);
 
 for i = 1:16
-	[pxy,f] = cpsd(damat(:,i),gamat(:,i),[],[],[],43700);
+	[pxy,f] = cpsd(bamat(:,i),damat(:,i),[],[],[],43700);
 	P = angle(pxy);
 	Q = unwrap(P);
 	phase(:,i) = Q;
 	freq(:,i) = f;
 	t(:,i) = i;
+end
+
+t=ones(129,16);
+for i = 1:16
+    t(:,i) = t(:,i)*i;
 end
 
 Phase = reshape(phase,[],1);
@@ -40,7 +44,11 @@ x = Time;
 y = Freq;
 z = Phase;
 
+
+
 %%
+
+
 % make plots
 % plot ABR wave
 x1 = linspace(0,20,1024);
@@ -62,10 +70,14 @@ ZI = griddata(x,y,z,XI,YI);
 %%
 % plot phaseogram
 contourf(XI,YI,ZI);
-xlabel('Time (ms)');
+xlabel('Time windows');
 ylabel('Frequency (Hz)')
-
+xlim([2 16])
 
 %%
 % plot surface plot
 surf(XI,YI,ZI);
+xlabel('Time windows');
+ylabel('Frequency (Hz)')
+zlabel('Cross-phase')
+colorbar
