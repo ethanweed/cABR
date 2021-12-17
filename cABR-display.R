@@ -35,12 +35,12 @@ names(df3) <- c("point", "time_ms", "d", "uV", "B1", "B2", "B3", "B4")
 
 df <-subset(df, df$uV > 0)
 
-df1 <- subset(df1, df1$uV>0)
-df2 <- subset(df2, df2$uV>0)
-df3 <- subset(df3, df3$uV>0)
+#df1 <- subset(df1, df1$uV>0)
+#df2 <- subset(df2, df2$uV>0)
+#df3 <- subset(df3, df3$uV>0)
 
-df1 <- df1[1:240,]
-df3 <- df3[1:240,]
+#df1 <- df1[1:240,]
+#df3 <- df3[1:240,]
 
 df$uV <- df$uV*-1
 
@@ -95,6 +95,14 @@ ggplot(data=df, aes(time_ms )) +
   ggtitle("/da/") + 
   xlim(-10,65)
 
+# smoothed polarites
+ggplot(data=df, aes(time_ms )) + 
+  geom_line(aes(y = rare, color = "rarefaction")) +
+  geom_line(aes(y = cond, color = "condensation")) +
+  geom_line(aes(y = alt, color = "alternating")) +
+  ggtitle("/da/") + 
+  xlim(-10,65)
+
 
 # plot 2 at a time for figure
 ggplot(data=df, aes(time_ms )) +
@@ -105,7 +113,7 @@ ggplot(data=df, aes(time_ms )) +
 
 
 # plot sum
-ggplot(data=df, aes(x= time_ms, y=uV)) + geom_line(size = 2.2, color = "black") + xlim(-10,65)
+ggplot(data=df, aes(x= time_ms, y=uV)) + geom_line(size = 1, color = "black") + xlim(-10,65)
 
 #########
 library(phonTools)
